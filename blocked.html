@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus Mode Active</title>
+    <link rel="stylesheet" href="blocked.css" />
+  </head>
+  <body>
+    <div class="screen">
+      <div class="glow"></div>
+
+      <div class="content">
+        <div class="lock-icon">&#128274;</div>
+        <h1 class="title">Focus Mode Active</h1>
+
+        <p class="blocked-line">
+          <span id="site-name" class="site-name">this website</span>
+          is blocked right now.
+        </p>
+
+        <!-- Countdown -->
+        <div class="timer-block">
+          <div id="countdown" class="countdown">00:00:00</div>
+          <p class="timer-label">remaining in your focus session</p>
+        </div>
+
+        <!-- Motivational quote -->
+        <blockquote id="quote" class="quote"></blockquote>
+
+        <!-- Emergency unlock -->
+        <div class="emergency">
+          <button id="toggle-emergency" class="link-btn">Emergency unlock</button>
+          <div id="emergency-form" class="emergency-form hidden">
+            <p class="hint">
+              Enter the session password to unlock early. (It stays hidden until
+              your timer ends.)
+            </p>
+            <div class="row">
+              <input
+                id="password-input"
+                type="password"
+                placeholder="Session password"
+              />
+              <button id="unlock-btn" class="btn-danger">Unlock</button>
+            </div>
+            <p id="unlock-error" class="error hidden"></p>
+          </div>
+        </div>
+
+        <!-- Shown only when the session has already ended -->
+        <div id="ended-box" class="ended-box hidden">
+          <p>Your focus session is complete. You can unlock now.</p>
+          <button id="disable-btn" class="btn-primary">Unlock sites</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="blocked.js"></script>
+  </body>
+</html>

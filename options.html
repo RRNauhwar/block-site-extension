@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus Lock &middot; Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <span class="logo">&#128274;</span>
+        <div>
+          <h1>Focus Lock Settings</h1>
+          <p class="tagline">Configuration &amp; strict-mode guidance</p>
+        </div>
+      </header>
+
+      <!-- Blocked sites management -->
+      <section class="card">
+        <h2>Blocked websites</h2>
+        <p class="muted">
+          Manage your block list here. You can only edit it while no focus
+          session is active.
+        </p>
+        <div id="active-warning" class="warn hidden">
+          A focus session is currently active &mdash; the list is locked until it
+          ends.
+        </div>
+        <div class="row">
+          <input id="site-input" type="text" placeholder="e.g. reddit.com" />
+          <button id="add-site" class="btn btn-primary">Add site</button>
+        </div>
+        <ul id="site-list" class="site-list"></ul>
+      </section>
+
+      <!-- Strict mode explanation -->
+      <section class="card">
+        <h2>Strict mode &amp; stronger protection</h2>
+        <p class="muted">
+          Focus Lock blocks sites and locks itself during a session. However, be
+          aware of an important limitation:
+        </p>
+        <div class="callout">
+          <strong>A Chrome extension cannot prevent its own removal.</strong>
+          Anyone with access to the browser can open
+          <code>chrome://extensions</code> and disable or uninstall Focus Lock,
+          which stops all blocking. This is a deliberate security boundary in
+          Chrome &mdash; no extension can override it.
+        </div>
+
+        <h3>How to make blocking truly enforced</h3>
+        <p class="muted">
+          For real, tamper-resistant enforcement (e.g. for schools, parents, or
+          serious self-control), combine Focus Lock with OS- or
+          enterprise-level policies that lock the extension in place:
+        </p>
+
+        <ol class="steps">
+          <li>
+            <strong>Force-install &amp; lock via enterprise policy.</strong>
+            Use Chrome's
+            <code>ExtensionInstallForcelist</code> policy to force-install the
+            extension so it cannot be removed by the user, and
+            <code>ExtensionSettings</code> with
+            <code>"installation_mode": "force_installed"</code> to prevent
+            disabling it.
+          </li>
+          <li>
+            <strong>Managed Chrome / Google Admin console.</strong>
+            On managed Chromebooks or enrolled browsers, an administrator can
+            pin the extension and block access to
+            <code>chrome://extensions</code> entirely.
+          </li>
+          <li>
+            <strong>Separate OS user account.</strong>
+            Create a restricted, non-admin operating-system user for study time.
+            Without admin rights, the policies above cannot be changed.
+          </li>
+          <li>
+            <strong>ChromeOS / parental controls.</strong>
+            On ChromeOS or with Family Link, a supervising account can enforce
+            extension and site policies that the supervised user cannot undo.
+          </li>
+        </ol>
+
+        <div class="links">
+          <a
+            href="https://chromeenterprise.google/policies/"
+            target="_blank"
+            rel="noopener"
+            >Chrome Enterprise policy reference</a
+          >
+        </div>
+        <p class="muted small">
+          Without these OS/enterprise measures, treat Focus Lock as a strong
+          deterrent and accountability tool &mdash; not an unbreakable lock.
+        </p>
+      </section>
+
+      <!-- How it works -->
+      <section class="card">
+        <h2>How Focus Lock works</h2>
+        <ul class="feature-list">
+          <li>Blocking uses Chrome's <code>declarativeNetRequest</code> dynamic rules.</li>
+          <li>Blocked pages are redirected to a local blocked screen.</li>
+          <li>Timer state is saved in <code>chrome.storage.local</code>, so it survives a browser restart.</li>
+          <li>A strong random password is generated at session start and hidden until the timer ends.</li>
+          <li>The block list and timer are locked while a session is active.</li>
+        </ul>
+      </section>
+
+      <footer class="footer">Focus Lock &middot; v1.0.0</footer>
+    </div>
+
+    <script src="options.js"></script>
+  </body>
+</html>
