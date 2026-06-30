@@ -9,33 +9,47 @@
   <body>
     <div class="screen">
       <div class="glow"></div>
-
       <div class="content">
-        <div class="lock-icon">&#128274;</div>
-        <h1 class="title">Focus Mode Active</h1>
-
+        <div class="badge-mode" id="mode-badge">Focus mode</div>
+        <div class="lock-icon">&#9889;</div>
+        <h1 class="title">Stay in the zone</h1>
         <p class="blocked-line">
-          <span id="site-name" class="site-name">this website</span>
-          is blocked right now.
+          <span id="site-name" class="site-name">this site</span> is blocked
+          right now.
         </p>
 
-        <!-- Countdown -->
         <div class="timer-block">
           <div id="countdown" class="countdown">00:00:00</div>
           <p class="timer-label">remaining in your focus session</p>
         </div>
 
-        <!-- Motivational quote -->
-        <blockquote id="quote" class="quote"></blockquote>
+        <!-- Live attempt counter (real) -->
+        <div class="attempt-row">
+          <span id="attempt-count" class="attempt-count">0</span>
+          <span class="attempt-label">distraction attempts this session</span>
+        </div>
 
-        <!-- Shown only when the session has already ended -->
+        <!-- AI coach intervention (behaviour-driven) -->
+        <div id="coach" class="coach hidden">
+          <div class="coach-head">
+            <span class="coach-avatar">&#129302;</span>
+            <span id="coach-title" class="coach-title">Your coach</span>
+          </div>
+          <p id="coach-body" class="coach-body"></p>
+        </div>
+
+        <!-- Goal reminder -->
+        <p id="goal-line" class="goal-line hidden"></p>
+
+        <!-- Ended state -->
         <div id="ended-box" class="ended-box hidden">
-          <p>Your focus session is complete. You can unlock now.</p>
+          <p>Your focus session is complete.</p>
           <button id="disable-btn" class="btn-primary">Unlock sites</button>
         </div>
+
+        <p class="footer-note" id="mode-note"></p>
       </div>
     </div>
-
     <script src="blocked.js"></script>
   </body>
 </html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Focus Lock AI &middot; Analytics</title>
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <div class="brand">
+          <span class="logo">&#9889;</span>
+          <div>
+            <h1>Analytics</h1>
+            <p class="sub">Your real focus data &mdash; computed locally, never uploaded.</p>
+          </div>
+        </div>
+        <div class="level-chip">
+          <span class="lvl" id="level">Lv 1</span>
+          <div class="xp-bar"><div id="xp-fill" class="xp-fill"></div></div>
+          <span class="xp-text" id="xp-text">0 XP</span>
+        </div>
+      </header>
+
+      <!-- Headline stats -->
+      <section class="stat-grid">
+        <div class="stat-card">
+          <span class="stat-num" id="s-hours">0</span>
+          <span class="stat-lbl">Focus hours</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="s-sessions">0</span>
+          <span class="stat-lbl">Sessions</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="s-rate">0%</span>
+          <span class="stat-lbl">Completion rate</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="s-attempts">0</span>
+          <span class="stat-lbl">Distraction attempts</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="s-streak">0</span>
+          <span class="stat-lbl">Current streak</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-num" id="s-longest">0</span>
+          <span class="stat-lbl">Longest streak</span>
+        </div>
+      </section>
+
+      <!-- AI insights -->
+      <section class="panel">
+        <h2>&#129302; AI insights</h2>
+        <ul id="insights" class="insights"></ul>
+      </section>
+
+      <div class="two-col">
+        <!-- 7-day trend -->
+        <section class="panel">
+          <h2>Last 7 days &middot; focus minutes</h2>
+          <div id="bar-chart" class="bar-chart"></div>
+        </section>
+
+        <!-- Top distractions -->
+        <section class="panel">
+          <h2>Most distracting sites</h2>
+          <div id="top-sites" class="top-sites"></div>
+        </section>
+      </div>
+
+      <!-- Hour-of-day heatmap -->
+      <section class="panel">
+        <h2>When you focus &middot; by hour of day</h2>
+        <div id="heatmap" class="heatmap"></div>
+        <div class="heatmap-legend">
+          <span>12a</span><span>6a</span><span>12p</span><span>6p</span><span>11p</span>
+        </div>
+      </section>
+
+      <!-- Achievements -->
+      <section class="panel">
+        <h2>Achievements</h2>
+        <div id="achievements" class="achievements"></div>
+      </section>
+
+      <section class="panel report">
+        <h2>Weekly report</h2>
+        <p id="report-body" class="report-body"></p>
+        <p class="privacy-note">
+          &#128274; All of this is computed from your own usage on this device.
+          No accounts, no servers, no tracking.
+        </p>
+      </section>
+    </div>
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>

@@ -3,114 +3,141 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Focus Lock &middot; Settings</title>
+    <title>Focus Lock AI &middot; Settings</title>
     <link rel="stylesheet" href="options.css" />
   </head>
   <body>
     <div class="page">
       <header class="header">
-        <span class="logo">&#128274;</span>
+        <span class="logo">&#9889;</span>
         <div>
-          <h1>Focus Lock Settings</h1>
-          <p class="tagline">Configuration &amp; strict-mode guidance</p>
+          <h1>Focus Lock AI &mdash; Settings</h1>
+          <p class="tagline">Block lists, focus modes, coaching &amp; privacy</p>
         </div>
       </header>
 
-      <!-- Blocked sites management -->
+      <div id="active-warning" class="warn hidden">
+        A focus session is active &mdash; block lists are locked until it ends.
+      </div>
+
+      <!-- Block lists -->
       <section class="card">
-        <h2>Blocked websites</h2>
-        <p class="muted">
-          Manage your block list here. You can only edit it while no focus
-          session is active.
-        </p>
-        <div id="active-warning" class="warn hidden">
-          A focus session is currently active &mdash; the list is locked until it
-          ends.
+        <h2>Block lists</h2>
+        <p class="muted">Create unlimited named lists (e.g. "Deep Work", "Study", "Evenings").</p>
+        <div class="row">
+          <select id="list-picker" class="select"></select>
+          <button id="add-list" class="btn btn-secondary">+ New list</button>
+          <button id="rename-list" class="btn btn-secondary">Rename</button>
+          <button id="delete-list" class="btn btn-danger-ghost">Delete</button>
         </div>
         <div class="row">
-          <input id="site-input" type="text" placeholder="e.g. reddit.com" />
+          <input id="site-input" type="text" placeholder="Add a site, e.g. tiktok.com" />
           <button id="add-site" class="btn btn-primary">Add site</button>
         </div>
         <ul id="site-list" class="site-list"></ul>
       </section>
 
-      <!-- Strict mode explanation -->
+      <!-- Focus modes -->
       <section class="card">
-        <h2>Strict mode &amp; stronger protection</h2>
-        <p class="muted">
-          Focus Lock blocks sites and locks itself during a session. However, be
-          aware of an important limitation:
-        </p>
-        <div class="callout">
-          <strong>A Chrome extension cannot prevent its own removal.</strong>
-          Anyone with access to the browser can open
-          <code>chrome://extensions</code> and disable or uninstall Focus Lock,
-          which stops all blocking. This is a deliberate security boundary in
-          Chrome &mdash; no extension can override it.
+        <h2>Focus modes explained</h2>
+        <div class="mode-card">
+          <h3>Soft</h3>
+          <p class="muted">Sites are blocked, but you can end the session anytime. Best for building the habit.</p>
         </div>
-
-        <h3>How to make blocking truly enforced</h3>
-        <p class="muted">
-          For real, tamper-resistant enforcement (e.g. for schools, parents, or
-          serious self-control), combine Focus Lock with OS- or
-          enterprise-level policies that lock the extension in place:
-        </p>
-
-        <ol class="steps">
-          <li>
-            <strong>Force-install &amp; lock via enterprise policy.</strong>
-            Use Chrome's
-            <code>ExtensionInstallForcelist</code> policy to force-install the
-            extension so it cannot be removed by the user, and
-            <code>ExtensionSettings</code> with
-            <code>"installation_mode": "force_installed"</code> to prevent
-            disabling it.
-          </li>
-          <li>
-            <strong>Managed Chrome / Google Admin console.</strong>
-            On managed Chromebooks or enrolled browsers, an administrator can
-            pin the extension and block access to
-            <code>chrome://extensions</code> entirely.
-          </li>
-          <li>
-            <strong>Separate OS user account.</strong>
-            Create a restricted, non-admin operating-system user for study time.
-            Without admin rights, the policies above cannot be changed.
-          </li>
-          <li>
-            <strong>ChromeOS / parental controls.</strong>
-            On ChromeOS or with Family Link, a supervising account can enforce
-            extension and site policies that the supervised user cannot undo.
-          </li>
-        </ol>
-
-        <div class="links">
-          <a
-            href="https://chromeenterprise.google/policies/"
-            target="_blank"
-            rel="noopener"
-            >Chrome Enterprise policy reference</a
-          >
+        <div class="mode-card">
+          <h3>Hard</h3>
+          <p class="muted">Ending early requires a 2-minute waiting period — long enough to break an impulse.</p>
         </div>
+        <div class="mode-card">
+          <h3>Extreme &#128293;</h3>
+          <p class="muted">No normal quitting. A "recovery unlock" exists but takes 10 minutes to complete, deliberately defeating impulsive exits. Each Extreme session also generates a private recovery code stored in your local history.</p>
+        </div>
+      </section>
+
+      <!-- AI coach -->
+      <section class="card">
+        <h2>AI accountability coach</h2>
+        <label class="toggle-row">
+          <input type="checkbox" id="coach-enabled" />
+          <span>Enable the behavioral coach (interventions at 5 / 10 / 20 / 35 attempts)</span>
+        </label>
         <p class="muted small">
-          Without these OS/enterprise measures, treat Focus Lock as a strong
-          deterrent and accountability tool &mdash; not an unbreakable lock.
+          The built-in coach is rule-based and runs fully offline using your real
+          in-session behaviour. Optionally connect your own AI model below for
+          richer, generated coaching.
+        </p>
+
+        <details class="advanced">
+          <summary>Connect your own AI model (optional, advanced)</summary>
+          <label class="toggle-row">
+            <input type="checkbox" id="llm-enabled" />
+            <span>Use a custom OpenAI-compatible endpoint</span>
+          </label>
+          <div class="grid-2">
+            <label class="field"><span>Base URL</span>
+              <input id="llm-base" type="text" placeholder="https://api.openai.com/v1" /></label>
+            <label class="field"><span>Model</span>
+              <input id="llm-model" type="text" placeholder="gpt-4o-mini" /></label>
+          </div>
+          <label class="field"><span>API key (stored locally, never synced)</span>
+            <input id="llm-key" type="password" placeholder="sk-..." /></label>
+          <p class="muted small">
+            Your key is stored only in local extension storage on this device and
+            is sent solely to the endpoint you specify. Leave disabled to stay 100% offline.
+          </p>
+        </details>
+      </section>
+
+      <!-- Sync -->
+      <section class="card">
+        <h2>Cross-device sync</h2>
+        <label class="toggle-row">
+          <input type="checkbox" id="sync-enabled" />
+          <span>Sync block lists &amp; settings across my Chrome devices</span>
+        </label>
+        <p class="muted small">
+          Uses Chrome's built-in <code>storage.sync</code> (tied to your Google
+          profile). Your analytics history stays local. Your AI key is never synced.
         </p>
       </section>
 
-      <!-- How it works -->
+      <!-- Privacy -->
       <section class="card">
-        <h2>How Focus Lock works</h2>
+        <h2>Privacy</h2>
         <ul class="feature-list">
-          <li>Blocking uses Chrome's <code>declarativeNetRequest</code> dynamic rules.</li>
-          <li>Blocked pages are redirected to a local blocked screen.</li>
-          <li>Timer state is saved in <code>chrome.storage.local</code>, so it survives a browser restart.</li>
-          <li>Once a session starts, there is no early unlock &mdash; blocking stays on until the timer ends.</li>
-          <li>The block list and timer are locked while a session is active.</li>
+          <li>No accounts, no servers, no analytics SDKs, no tracking.</li>
+          <li>All sessions, attempts and stats live in <code>chrome.storage.local</code> on your device.</li>
+          <li>Optional sync uses Chrome's own encrypted sync — we never see your data.</li>
+          <li>Privacy is a feature, not a setting we can revoke.</li>
         </ul>
       </section>
 
-      <footer class="footer">Focus Lock &middot; v1.0.0</footer>
+      <!-- Strict mode / enterprise -->
+      <section class="card">
+        <h2>Stronger enforcement (strict mode)</h2>
+        <div class="callout">
+          <strong>A browser extension cannot block desktop/mobile apps or stop its own removal.</strong>
+          For tamper-resistant enforcement, combine Focus Lock AI with OS- or
+          organization-level controls.
+        </div>
+        <ol class="steps">
+          <li><strong>Force-install via policy.</strong> Chrome's <code>ExtensionInstallForcelist</code> + <code>ExtensionSettings</code> (<code>force_installed</code>) prevent removal/disabling.</li>
+          <li><strong>Managed Chrome / Admin console.</strong> Pin the extension and block <code>chrome://extensions</code>.</li>
+          <li><strong>Restricted OS account.</strong> A non-admin user during focus hours can't change these policies.</li>
+          <li><strong>ChromeOS / Family Link.</strong> A supervisor can enforce policies the supervised user can't undo.</li>
+        </ol>
+        <p class="muted">
+          App/notification blocking and uninstall protection require the native
+          desktop &amp; mobile apps on our roadmap (see <code>ARCHITECTURE.md</code>).
+        </p>
+      </section>
+
+      <div class="save-bar">
+        <button id="save" class="btn btn-primary">Save settings</button>
+        <span id="saved-note" class="saved-note hidden">Saved &#10003;</span>
+      </div>
+
+      <footer class="footer">Focus Lock AI &middot; v2.0.0 &middot; privacy-first</footer>
     </div>
 
     <script src="options.js"></script>

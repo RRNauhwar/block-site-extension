@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Focus Lock</title>
+    <title>Focus Lock AI</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
@@ -11,100 +11,141 @@
       <!-- Header -->
       <header class="header">
         <div class="brand">
-          <span class="logo">&#128274;</span>
+          <span class="logo">&#9889;</span>
           <div>
-            <h1>Focus Lock</h1>
-            <p class="tagline">Block distractions. Get things done.</p>
+            <h1>Focus Lock <span class="ai">AI</span></h1>
+            <p class="tagline">Your focus accountability system</p>
           </div>
         </div>
-        <button id="open-settings" class="icon-btn" title="Settings">&#9881;</button>
+        <div class="header-actions">
+          <button id="open-dashboard" class="icon-btn" title="Analytics">&#128202;</button>
+          <button id="open-settings" class="icon-btn" title="Settings">&#9881;</button>
+        </div>
       </header>
 
-      <!-- ============ IDLE VIEW: set up a session ============ -->
+      <!-- Lifetime mini-stats (real data) -->
+      <div id="mini-stats" class="mini-stats">
+        <div class="mini">
+          <span id="ms-level" class="mini-val">1</span><span class="mini-label">Level</span>
+        </div>
+        <div class="mini">
+          <span id="ms-streak" class="mini-val">0</span><span class="mini-label">Day streak</span>
+        </div>
+        <div class="mini">
+          <span id="ms-hours" class="mini-val">0</span><span class="mini-label">Focus hrs</span>
+        </div>
+      </div>
+
+      <!-- ============ IDLE VIEW ============ -->
       <section id="view-idle" class="view">
-        <!-- Add site -->
+        <!-- Active block list -->
         <div class="card">
-          <label class="card-title" for="site-input">Blocked websites</label>
-          <div class="row">
-            <input
-              id="site-input"
-              type="text"
-              placeholder="e.g. instagram.com"
-              autocomplete="off"
-            />
-            <button id="add-site" class="btn btn-primary">Add</button>
+          <div class="card-head">
+            <label class="card-title" for="list-select">Block list</label>
+            <button id="manage-lists" class="text-btn">Manage</button>
           </div>
-          <ul id="site-list" class="site-list"></ul>
+          <select id="list-select" class="select"></select>
+          <p id="list-summary" class="hint"></p>
         </div>
 
-        <!-- Timer selection -->
+        <!-- Goal -->
         <div class="card">
-          <span class="card-title">Focus duration</span>
+          <label class="card-title" for="goal-text">Session goal (optional)</label>
+          <input id="goal-text" type="text" placeholder="e.g. Write 1000 words" />
+          <div class="seg" id="unlock-seg">
+            <button class="seg-btn active" data-unlock="timer">Timer</button>
+            <button class="seg-btn" data-unlock="goal">Goal</button>
+            <button class="seg-btn" data-unlock="both">Both</button>
+          </div>
+          <p class="hint">Choose what unlocks your session.</p>
+        </div>
+
+        <!-- Duration -->
+        <div class="card">
+          <span class="card-title">Duration</span>
           <div class="duration-grid">
-            <button class="duration-btn" data-minutes="30">30 min</button>
-            <button class="duration-btn" data-minutes="60">1 hour</button>
-            <button class="duration-btn" data-minutes="120">2 hours</button>
+            <button class="duration-btn" data-minutes="15">15m</button>
+            <button class="duration-btn" data-minutes="30">30m</button>
+            <button class="duration-btn" data-minutes="60">1h</button>
+            <button class="duration-btn" data-minutes="120">2h</button>
             <button class="duration-btn" data-custom="true">Custom</button>
           </div>
           <div id="custom-row" class="row hidden">
-            <input
-              id="custom-minutes"
-              type="number"
-              min="1"
-              max="1440"
-              placeholder="Minutes"
-            />
+            <input id="custom-minutes" type="number" min="1" max="1440" placeholder="Minutes" />
             <span class="hint">minutes</span>
           </div>
         </div>
 
-        <!-- Warning + start -->
-        <div class="warn-box">
-          <strong>Heads up:</strong> Once you start, you cannot edit the list or
-          stop the timer. Blocking stays on until the time is up &mdash; there is
-          no early unlock.
+        <!-- Mode -->
+        <div class="card">
+          <span class="card-title">Focus mode</span>
+          <div class="mode-list" id="mode-list">
+            <button class="mode-btn active" data-mode="soft">
+              <span class="mode-name">Soft</span>
+              <span class="mode-desc">Leave anytime</span>
+            </button>
+            <button class="mode-btn" data-mode="hard">
+              <span class="mode-name">Hard</span>
+              <span class="mode-desc">2-min wait to quit</span>
+            </button>
+            <button class="mode-btn" data-mode="extreme">
+              <span class="mode-name">Extreme &#128293;</span>
+              <span class="mode-desc">No quitting; 10-min recovery only</span>
+            </button>
+          </div>
         </div>
-        <button id="start-focus" class="btn btn-start">Start Focus</button>
+
+        <button id="start-focus" class="btn btn-start">Start Focus Session</button>
         <p id="idle-error" class="error hidden"></p>
       </section>
 
-      <!-- ============ ACTIVE VIEW: timer running ============ -->
+      <!-- ============ ACTIVE VIEW ============ -->
       <section id="view-active" class="view hidden">
         <div class="timer-card">
-          <p class="status-pill">&#128293; Focus Mode Active</p>
+          <div class="active-top">
+            <span class="status-pill">&#128293; <span id="active-mode">Focus</span></span>
+            <span id="attempts-pill" class="attempts-pill" title="Distraction attempts">0 attempts</span>
+          </div>
           <div id="countdown" class="countdown">00:00:00</div>
           <p class="timer-sub">remaining</p>
           <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
+          <p id="active-goal" class="active-goal hidden"></p>
         </div>
 
-        <div class="card">
-          <span class="card-title">Locked websites</span>
-          <ul id="active-site-list" class="site-list locked"></ul>
+        <!-- Coach message (real, behavior-driven) -->
+        <div id="coach-card" class="coach-card hidden">
+          <div class="coach-head">
+            <span class="coach-avatar">&#129302;</span>
+            <span id="coach-title" class="coach-title">Coach</span>
+          </div>
+          <p id="coach-body" class="coach-body"></p>
         </div>
 
-        <div class="lock-note">
-          &#128274; The list is locked and the timer cannot be stopped until it
-          reaches zero. Stay focused &mdash; you've got this!
-        </div>
+        <!-- Goal completion -->
+        <button id="complete-goal" class="btn btn-ghost hidden">Mark goal complete</button>
+
+        <!-- Quit (mode-dependent) -->
+        <button id="quit-btn" class="btn btn-quit">End session</button>
+        <p id="quit-note" class="hint center hidden"></p>
+
+        <!-- Extreme recovery -->
+        <button id="recovery-btn" class="text-btn danger hidden">Start emergency recovery unlock</button>
       </section>
 
-      <!-- ============ ENDED VIEW: session complete ============ -->
+      <!-- ============ ENDED VIEW ============ -->
       <section id="view-ended" class="view hidden">
         <div class="done-card">
-          <span class="done-emoji">&#127881;</span>
-          <h2>Session complete!</h2>
-          <p class="hint">Great work staying focused. You can unlock your sites
-            now.</p>
+          <span id="done-emoji" class="done-emoji">&#127881;</span>
+          <h2 id="done-title">Session complete!</h2>
+          <p id="done-sub" class="hint"></p>
+          <div class="done-stats">
+            <div><span id="done-focus" class="done-stat">0</span><small>min focused</small></div>
+            <div><span id="done-attempts" class="done-stat">0</span><small>attempts</small></div>
+            <div><span id="done-xp" class="done-stat">+0</span><small>XP</small></div>
+          </div>
         </div>
-
-        <button id="disable-blocking" class="btn btn-start">
-          Disable blocking &amp; unlock sites
-        </button>
-
-        <div class="card">
-          <span class="card-title">Recent sessions</span>
-          <ul id="history-list" class="history-list"></ul>
-        </div>
+        <button id="disable-blocking" class="btn btn-start">Unlock sites</button>
+        <button id="view-report" class="btn btn-ghost">View analytics</button>
       </section>
     </div>
 
