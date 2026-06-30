@@ -61,8 +61,8 @@
         <!-- Warning + start -->
         <div class="warn-box">
           <strong>Heads up:</strong> Once you start, you cannot edit the list or
-          stop early &mdash; a hidden emergency password is generated and only
-          revealed when the timer ends.
+          stop the timer. Blocking stays on until the time is up &mdash; there is
+          no early unlock.
         </div>
         <button id="start-focus" class="btn btn-start">Start Focus</button>
         <p id="idle-error" class="error hidden"></p>
@@ -83,20 +83,8 @@
         </div>
 
         <div class="lock-note">
-          &#128274; The list is locked and the timer cannot be stopped. Use the
-          emergency unlock only if you saved the password.
-        </div>
-        <button id="show-emergency" class="btn btn-ghost">Emergency unlock</button>
-
-        <!-- Emergency unlock form -->
-        <div id="emergency-box" class="card emergency hidden">
-          <span class="card-title">Emergency unlock</span>
-          <p class="hint">Enter the session password to unlock early.</p>
-          <div class="row">
-            <input id="emergency-input" type="password" placeholder="Password" />
-            <button id="emergency-submit" class="btn btn-danger">Unlock</button>
-          </div>
-          <p id="emergency-error" class="error hidden"></p>
+          &#128274; The list is locked and the timer cannot be stopped until it
+          reaches zero. Stay focused &mdash; you've got this!
         </div>
       </section>
 
@@ -105,12 +93,8 @@
         <div class="done-card">
           <span class="done-emoji">&#127881;</span>
           <h2>Session complete!</h2>
-          <p class="hint">Great work staying focused. Here is the password that
-            was protecting this session:</p>
-          <div class="password-reveal">
-            <code id="revealed-password">&mdash;</code>
-            <button id="copy-password" class="icon-btn" title="Copy">&#128203;</button>
-          </div>
+          <p class="hint">Great work staying focused. You can unlock your sites
+            now.</p>
         </div>
 
         <button id="disable-blocking" class="btn btn-start">

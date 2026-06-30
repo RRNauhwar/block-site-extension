@@ -4,16 +4,19 @@
  * Responsibilities:
  *  - Persist all state in chrome.storage.local (survives browser restarts).
  *  - Manage the focus session lifecycle (idle -> active -> ended -> idle).
- *  - Generate a strong random password when a session starts (hidden until end).
  *  - Apply / remove chrome.declarativeNetRequest dynamic rules that redirect
  *    blocked websites to a local blocked.html page.
  *  - Use chrome.alarms (with a periodic fallback) to detect when the timer ends.
  *  - Re-apply rules on startup if a session is still active.
  *
+ * There is intentionally NO early-unlock mechanism: once a session starts it
+ * is fully locked until the timer ends. The block list and timer cannot be
+ * changed or stopped while active.
+ *
  * All persistent data lives under three storage keys:
  *  - "blockedSites": string[]  (bare domains, e.g. "instagram.com")
  *  - "session":      object    (current session state, see DEFAULT_SESSION)
- *  - "history":      object[]  (past sessions, including their passwords)
+ *  - "history":      object[]  (past sessions)
  */
 
 // ---------------------------------------------------------------------------
@@ -26,7 +29,7 @@ const ALARM_CHECK = "focusLock:check"; // periodic safety-net check (every minut
 // Session "phase" values.
 const PHASE_IDLE = "idle"; // no session running, sites are not blocked
 const PHASE_ACTIVE = "active"; // timer running, sites blocked, locked down
-const PHASE_ENDED = "ended"; // timer finished, password revealed, awaiting unlock
+const PHASE_ENDED = "ended"; // timer finished, awaiting the user to unlock
 
 // Default seed list so a new user immediately sees how it works.
 const DEFAULT_SITES = [
@@ -42,7 +45,6 @@ const DEFAULT_SESSION = {
   startTime: null, // epoch ms when the session started
   endTime: null, // epoch ms when the session is scheduled to end
   durationMs: null, // total planned duration in ms
-  password: null, // strong random password (kept secret until phase === ended)
 };
 
 // ---------------------------------------------------------------------------
@@ -97,22 +99,6 @@ function normalizeSite(input) {
   // Strip a leading "www."
   s = s.replace(/^www\./, "");
   return s;
-}
-
-/**
- * Generate a cryptographically strong random password.
- * Uses crypto.getRandomValues so it cannot be guessed.
- */
-function generatePassword(length = 16) {
-  const charset =
-    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*";
-  const bytes = new Uint32Array(length);
-  crypto.getRandomValues(bytes);
-  let out = "";
-  for (let i = 0; i < length; i++) {
-    out += charset[bytes[i] % charset.length];
-  }
-  return out;
 }
 
 // ---------------------------------------------------------------------------
@@ -188,7 +174,7 @@ function clearAlarms() {
 
 /**
  * Start a focus session for the given duration (ms).
- * Generates a hidden password, applies blocking rules, and schedules alarms.
+ * Applies blocking rules and schedules alarms. There is no way to stop early.
  */
 async function startSession(durationMs) {
   const sites = await getBlockedSites();
@@ -198,7 +184,6 @@ async function startSession(durationMs) {
     startTime: now,
     endTime: now + durationMs,
     durationMs,
-    password: generatePassword(16),
   };
   await setSession(session);
   await applyRules(sites);
@@ -208,8 +193,8 @@ async function startSession(durationMs) {
 
 /**
  * Called when the timer reaches its end naturally.
- * Moves to the ENDED phase, records history, and reveals the password.
- * Blocking rules stay active until the user explicitly disables blocking.
+ * Moves to the ENDED phase and records history. Blocking rules stay active
+ * until the user explicitly disables blocking from the popup/blocked page.
  */
 async function endSession() {
   const session = await getSession();
@@ -223,45 +208,13 @@ async function endSession() {
     startTime: session.startTime,
     endTime: session.endTime,
     durationMs: session.durationMs,
-    password: session.password,
     sites: [...sites],
-    unlockedEarly: false,
     completedAt: Date.now(),
   });
 
   // The precise alarm has fired; stop the periodic check.
   chrome.alarms.clear(ALARM_CHECK);
   return ended;
-}
-
-/**
- * Emergency unlock: verify the provided password against the secret one.
- * On success the session ends early, rules are removed, and we log it.
- */
-async function emergencyUnlock(password) {
-  const session = await getSession();
-  if (session.phase !== PHASE_ACTIVE) {
-    return { success: false, reason: "no-active-session" };
-  }
-  if (!password || password !== session.password) {
-    return { success: false, reason: "wrong-password" };
-  }
-
-  const sites = await getBlockedSites();
-  await pushHistory({
-    startTime: session.startTime,
-    endTime: session.endTime,
-    durationMs: session.durationMs,
-    password: session.password,
-    sites: [...sites],
-    unlockedEarly: true,
-    completedAt: Date.now(),
-  });
-
-  await clearRules();
-  clearAlarms();
-  await setSession({ ...DEFAULT_SESSION });
-  return { success: true };
 }
 
 /**
@@ -346,12 +299,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
             getSession(),
             getHistory(),
           ]);
-          // Never expose the secret password while the session is active.
-          const safeSession =
-            session.phase === PHASE_ACTIVE
-              ? { ...session, password: null }
-              : session;
-          sendResponse({ ok: true, blockedSites, session: safeSession, history });
+          sendResponse({ ok: true, blockedSites, session, history });
           break;
         }
 
@@ -405,17 +353,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
             break;
           }
           const started = await startSession(durationMs);
-          // Never leak the password back to the UI while active.
-          sendResponse({
-            ok: true,
-            session: { ...started, password: null },
-          });
-          break;
-        }
-
-        case "verifyPassword": {
-          const result = await emergencyUnlock(message.password);
-          sendResponse({ ok: result.success, reason: result.reason });
+          sendResponse({ ok: true, session: started });
           break;
         }
 

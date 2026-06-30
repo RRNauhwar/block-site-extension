@@ -30,14 +30,7 @@ const idleError = document.getElementById("idle-error");
 const countdownEl = document.getElementById("countdown");
 const progressBar = document.getElementById("progress-bar");
 const activeSiteList = document.getElementById("active-site-list");
-const showEmergencyBtn = document.getElementById("show-emergency");
-const emergencyBox = document.getElementById("emergency-box");
-const emergencyInput = document.getElementById("emergency-input");
-const emergencySubmit = document.getElementById("emergency-submit");
-const emergencyError = document.getElementById("emergency-error");
 
-const revealedPassword = document.getElementById("revealed-password");
-const copyPasswordBtn = document.getElementById("copy-password");
 const disableBlockingBtn = document.getElementById("disable-blocking");
 const historyList = document.getElementById("history-list");
 const openSettingsBtn = document.getElementById("open-settings");
@@ -139,15 +132,11 @@ function renderHistory(history) {
     const when = new Date(h.completedAt || h.endTime).toLocaleString();
     const mins = Math.round((h.durationMs || 0) / 60000);
     top.innerHTML = `<span>${when}</span><span>${mins} min</span>`;
-    const pw = document.createElement("div");
-    pw.innerHTML = `Password: <code>${h.password || "&mdash;"}</code>`;
-    li.append(top, pw);
-    if (h.unlockedEarly) {
-      const badge = document.createElement("span");
-      badge.className = "badge";
-      badge.textContent = "unlocked early";
-      li.appendChild(badge);
-    }
+    const sub = document.createElement("div");
+    const count = Array.isArray(h.sites) ? h.sites.length : 0;
+    sub.className = "hint";
+    sub.textContent = `${count} site${count === 1 ? "" : "s"} blocked`;
+    li.append(top, sub);
     historyList.appendChild(li);
   });
 }
@@ -168,7 +157,6 @@ async function refresh() {
   } else if (session.phase === "ended") {
     if (countdownTimer) clearInterval(countdownTimer);
     showView("ended");
-    revealedPassword.textContent = session.password || "\u2014";
     renderHistory(history);
   } else {
     if (countdownTimer) clearInterval(countdownTimer);
@@ -206,22 +194,6 @@ async function startFocus() {
     await refresh();
   } else {
     showIdleError(errorText(res.reason));
-  }
-}
-
-async function submitEmergency() {
-  emergencyError.classList.add("hidden");
-  const password = emergencyInput.value;
-  const res = await send({ type: "verifyPassword", password });
-  if (res.ok) {
-    emergencyInput.value = "";
-    await refresh();
-  } else {
-    emergencyError.textContent =
-      res.reason === "wrong-password"
-        ? "Incorrect password. The session stays locked."
-        : "Unable to unlock.";
-    emergencyError.classList.remove("hidden");
   }
 }
 
@@ -286,27 +258,6 @@ customMinutes.addEventListener("input", () => {
 });
 
 startBtn.addEventListener("click", startFocus);
-
-showEmergencyBtn.addEventListener("click", () => {
-  emergencyBox.classList.toggle("hidden");
-});
-emergencySubmit.addEventListener("click", submitEmergency);
-emergencyInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") submitEmergency();
-});
-
-copyPasswordBtn.addEventListener("click", async () => {
-  const text = revealedPassword.textContent;
-  if (text && text !== "\u2014") {
-    try {
-      await navigator.clipboard.writeText(text);
-      copyPasswordBtn.textContent = "\u2713"; // ✓
-      setTimeout(() => (copyPasswordBtn.textContent = "\uD83D\uDCCB"), 1200);
-    } catch (_) {
-      /* clipboard may be unavailable; ignore */
-    }
-  }
-});
 
 disableBlockingBtn.addEventListener("click", disableBlocking);
 
