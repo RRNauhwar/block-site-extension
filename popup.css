@@ -90,8 +90,7 @@ h1 {
 }
 
 input[type="text"],
-input[type="number"],
-input[type="password"] {
+input[type="number"] {
   flex: 1;
   background: var(--bg-elev-2);
   border: 1px solid var(--border);
@@ -326,10 +325,6 @@ input:focus {
   margin-bottom: 12px;
 }
 
-.emergency {
-  border-color: rgba(248, 113, 113, 0.4);
-}
-
 /* Ended view */
 .done-card {
   background: linear-gradient(160deg, #15241d, #141824);
@@ -347,25 +342,6 @@ input:focus {
 .done-card h2 {
   margin: 8px 0;
   font-size: 20px;
-}
-
-.password-reveal {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: center;
-  margin-top: 14px;
-}
-
-.password-reveal code {
-  background: var(--bg);
-  border: 1px dashed var(--accent);
-  border-radius: 8px;
-  padding: 10px 14px;
-  font-size: 16px;
-  letter-spacing: 1px;
-  color: var(--accent);
-  word-break: break-all;
 }
 
 /* History */
@@ -390,19 +366,6 @@ input:focus {
   display: flex;
   justify-content: space-between;
   margin-bottom: 4px;
-}
-
-.history-list code {
-  color: var(--accent);
-  word-break: break-all;
-}
-
-.history-list .badge {
-  font-size: 10px;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: rgba(248, 113, 113, 0.2);
-  color: var(--danger);
 }
 
 /* Helpers */

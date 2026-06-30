@@ -136,56 +136,7 @@ body {
   border-left: 3px solid var(--accent);
 }
 
-/* Emergency unlock */
-.emergency {
-  margin-top: 10px;
-}
-
-.link-btn {
-  background: none;
-  border: none;
-  color: var(--text-dim);
-  cursor: pointer;
-  font-size: 13px;
-  text-decoration: underline;
-}
-.link-btn:hover {
-  color: var(--text);
-}
-
-.emergency-form {
-  margin-top: 16px;
-  max-width: 420px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.hint {
-  font-size: 12px;
-  color: var(--text-dim);
-  margin-bottom: 10px;
-}
-
-.row {
-  display: flex;
-  gap: 8px;
-}
-
-input[type="password"] {
-  flex: 1;
-  background: #161922;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 11px 13px;
-  color: var(--text);
-  font-size: 15px;
-  outline: none;
-}
-input[type="password"]:focus {
-  border-color: var(--primary);
-}
-
-.btn-danger,
+/* Unlock button (shown only after the session ends) */
 .btn-primary {
   border: none;
   border-radius: 8px;
@@ -194,22 +145,10 @@ input[type="password"]:focus {
   font-weight: 600;
   color: #fff;
   cursor: pointer;
-}
-.btn-danger {
-  background: var(--danger);
-}
-.btn-primary {
   background: var(--primary);
 }
-.btn-danger:hover,
 .btn-primary:hover {
   filter: brightness(1.08);
-}
-
-.error {
-  color: var(--danger);
-  font-size: 13px;
-  margin-top: 10px;
 }
 
 .ended-box {

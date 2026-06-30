@@ -1,8 +1,9 @@
 /**
  * Focus Lock - blocked page logic.
  * This page is shown whenever a blocked site is opened during a focus session.
- * It displays the blocked site name, a live countdown, a motivational quote,
- * and an emergency-unlock form.
+ * It displays the blocked site name, a live countdown, and a motivational
+ * quote. There is no early unlock: the page only offers an "unlock" button
+ * after the session has ended.
  */
 
 // A small rotating set of motivational study quotes.
@@ -39,11 +40,6 @@ function formatTime(ms) {
 const siteNameEl = document.getElementById("site-name");
 const countdownEl = document.getElementById("countdown");
 const quoteEl = document.getElementById("quote");
-const toggleEmergencyBtn = document.getElementById("toggle-emergency");
-const emergencyForm = document.getElementById("emergency-form");
-const passwordInput = document.getElementById("password-input");
-const unlockBtn = document.getElementById("unlock-btn");
-const unlockError = document.getElementById("unlock-error");
 const endedBox = document.getElementById("ended-box");
 const disableBtn = document.getElementById("disable-btn");
 
@@ -91,33 +87,6 @@ function startCountdown(endTime) {
   tick();
   countdownTimer = setInterval(tick, 1000);
 }
-
-// --- Emergency unlock -------------------------------------------------------
-toggleEmergencyBtn.addEventListener("click", () => {
-  emergencyForm.classList.toggle("hidden");
-  passwordInput.focus();
-});
-
-async function attemptUnlock() {
-  unlockError.classList.add("hidden");
-  const password = passwordInput.value;
-  const res = await send({ type: "verifyPassword", password });
-  if (res.ok) {
-    // Unlocked: reload to load the originally requested site.
-    location.reload();
-  } else {
-    unlockError.textContent =
-      res.reason === "wrong-password"
-        ? "Incorrect password. Stay focused \u2014 you've got this!"
-        : "Unable to unlock right now.";
-    unlockError.classList.remove("hidden");
-  }
-}
-
-unlockBtn.addEventListener("click", attemptUnlock);
-passwordInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") attemptUnlock();
-});
 
 // --- Disable blocking after the session ends --------------------------------
 disableBtn.addEventListener("click", async () => {

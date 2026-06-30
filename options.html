@@ -105,7 +105,7 @@
           <li>Blocking uses Chrome's <code>declarativeNetRequest</code> dynamic rules.</li>
           <li>Blocked pages are redirected to a local blocked screen.</li>
           <li>Timer state is saved in <code>chrome.storage.local</code>, so it survives a browser restart.</li>
-          <li>A strong random password is generated at session start and hidden until the timer ends.</li>
+          <li>Once a session starts, there is no early unlock &mdash; blocking stays on until the timer ends.</li>
           <li>The block list and timer are locked while a session is active.</li>
         </ul>
       </section>
